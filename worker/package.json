@@ -1,5 +1,5 @@
 {
-  "name": "url-shortner",
+  "name": "worker",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,7 @@
   "dependencies": {
     "bullmq": "^6.3.10",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
     "ioredis": "^6.0.0",
-    "mongoose": "^9.9.4",
-    "nanoid": "^6.0.1",
-    "redis": "^6.2.1"
+    "mongoose": "^9.10.3"
   }
 }
