@@ -3,9 +3,10 @@ const express=require('express');
 const mongoose=require('mongoose');
 const urlRoute=require('./routes/url');
 const app=express();
+const cors=require('cors');
 
 app.use(express.json());
-
+app.use(cors());
 
 mongoose.connect(process.env.MONGO_URI)
         .then(()=>console.log("mongodb connected "))
