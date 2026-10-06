@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {nanoid}=require('nanoid');
+const { generateShortId } = require('../utils/generateId');
 const URL=require('../models/url');
 const redis=require('redis');
 const { Queue } = require('bullmq');
@@ -16,26 +16,38 @@ const redisConnection = new IORedis(process.env.REDIS_URL, {
 });
 
 //Generate New URL
+const MAX_RETRIES = 3;
+
 async function GenerateNewShortURL(req,res){
     const body=req.body;
     if(!body.url){
         return res.status(400).json({error:'Url is Required'});
     }
-    const shortID=nanoid(7);
+
     try{
-          await URL.create(
-            {
-                shortId:shortID,
-                longUrl:body.url,
-                visitArray:[],
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            const shortID = await generateShortId();   // new Snowflake ID, in base62
+            try{
+                await URL.create({
+                    shortId: shortID,
+                    longUrl: body.url,
+                    visitArray: [],
+                });
+                return res.json({id: shortID});
             }
-        );
-        return res.json({id:shortID});
+            catch(error){
+                // 11000 = "duplicate key": this ID is already taken
+                // (can happen later, e.g. if someone picked it as a custom alias).
+                // Just ask the counter for the next one and try again.
+                if (error.code === 11000) continue;
+                throw error;   
+            }
+        }
+        // All retries used up (should basically never happen)
+        return res.status(500).json({ error: 'Could not generate a unique ID, try again' });
     }
     catch(error){
-      if (error.code == 11000) {
-            return res.status(500).json({ error: 'Collision occured, try again' });
-        }
+        console.error('Generate URL Error:', error);
         return res.status(500).json({ error: 'Server Error' });
     }
 }
