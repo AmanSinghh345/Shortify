@@ -53,7 +53,7 @@ function App() {
             Shortify <span className="text-blue-500">URL</span>
           </h1>
           <p className="text-slate-400 text-lg">
-            Apne lambe URLs ko ek click mein chota aur trackable banayein.
+            Make your Bulky URL in Short
           </p>
         </div>
 
