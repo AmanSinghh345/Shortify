@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Link, Copy, CheckCircle2, Activity, ArrowRight, Globe } from 'lucide-react';
+import { Link, Copy, CheckCircle2, Activity, ArrowRight, Globe, Clock } from 'lucide-react';
 
 function App() {
   const [longUrl, setLongUrl] = useState('');
@@ -8,19 +8,31 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [alias, setAlias] = useState('');
+  const [expiresIn, setExpiresIn] = useState('never');
+  const [expiresAt, setExpiresAt] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setShortUrl('');
+    setExpiresAt(null);
     setLoading(true);
 
     try {
       // Backend API ko POST request bhej rahe hain
-      const response = await axios.post('http://localhost:8000/url', { url: longUrl });
+      // alias is optional: an empty string is sent as "no alias"
+      const response = await axios.post('http://localhost:8000/url', {
+        url: longUrl,
+        alias: alias.trim() || undefined,
+        expiresIn,
+      });
       setShortUrl(`http://localhost:8000/${response.data.id}`);
+      setExpiresAt(response.data.expiresAt);
     } catch (err) {
-      setError('Connection failed. Backend server check karein.');
+      // If the backend replied (e.g. "alias already taken"), show its message.
+      // Otherwise the server could not be reached at all.
+      setError(err.response?.data?.error || 'Connection failed. Backend server check karein.');
     } finally {
       setLoading(false);
     }
@@ -53,32 +65,65 @@ function App() {
             Shortify <span className="text-blue-500">URL</span>
           </h1>
           <p className="text-slate-400 text-lg">
-            Make your Bulky URL in Short
+            Apne lambe URLs ko ek click mein chota aur trackable banayein.
           </p>
         </div>
 
         {/* Glassmorphism Input Form */}
         <div className="bg-white/5 border border-white/10 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-            <div className="relative flex-1 flex items-center">
-              <Globe className="absolute left-4 text-slate-400" size={20} />
-              <input
-                type="url"
-                required
-                value={longUrl}
-                onChange={(e) => setLongUrl(e.target.value)}
-                placeholder="https://example.com/very-long-url..."
-                className="w-full pl-12 pr-4 py-4 bg-transparent outline-none text-white placeholder:text-slate-500 text-base"
-              />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1 flex items-center">
+                <Globe className="absolute left-4 text-slate-400" size={20} />
+                <input
+                  type="url"
+                  required
+                  value={longUrl}
+                  onChange={(e) => setLongUrl(e.target.value)}
+                  placeholder="https://example.com/very-long-url..."
+                  className="w-full pl-12 pr-4 py-4 bg-transparent outline-none text-white placeholder:text-slate-500 text-base"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 transition-colors rounded-xl font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              >
+                {loading ? 'Processing...' : 'Shorten'}
+                {!loading && <ArrowRight size={18} />}
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 transition-colors rounded-xl font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-            >
-              {loading ? 'Processing...' : 'Shorten'}
-              {!loading && <ArrowRight size={18} />}
-            </button>
+
+            {/* Optional settings: custom alias + expiry */}
+            <div className="flex flex-col sm:flex-row gap-2 px-2 pb-2">
+              <div className="relative flex-1 flex items-center">
+                <Link className="absolute left-3 text-slate-400" size={16} />
+                <input
+                  type="text"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                  maxLength={10}
+                  pattern="[A-Za-z0-9_\-]{3,10}"
+                  title="3-10 characters: letters, numbers, - or _"
+                  placeholder="Custom alias (optional)"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl outline-none text-white placeholder:text-slate-500 text-sm focus:border-blue-500/50"
+                />
+              </div>
+              <div className="relative flex items-center sm:w-48">
+                <Clock className="absolute left-3 text-slate-400 pointer-events-none" size={16} />
+                <select
+                  value={expiresIn}
+                  onChange={(e) => setExpiresIn(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl outline-none text-white text-sm focus:border-blue-500/50 cursor-pointer"
+                >
+                  <option value="never" className="bg-slate-900">Never expires</option>
+                  <option value="1h" className="bg-slate-900">1 hour</option>
+                  <option value="1d" className="bg-slate-900">1 day</option>
+                  <option value="7d" className="bg-slate-900">7 days</option>
+                  <option value="30d" className="bg-slate-900">30 days</option>
+                </select>
+              </div>
+            </div>
           </form>
         </div>
 
@@ -97,6 +142,11 @@ function App() {
               >
                 {shortUrl}
               </a>
+              {expiresAt && (
+                <p className="text-xs text-slate-400 mt-1">
+                  Expires: {new Date(expiresAt).toLocaleString()}
+                </p>
+              )}
             </div>
             <button
               onClick={handleCopy}
