@@ -1,3 +1,11 @@
+Application Screenshot : 
+
+<img width="1920" height="1080" alt="Screenshot 2026-10-27 194606" src="https://github.com/user-attachments/assets/2280bdac-f0da-426b-bb1d-5ea2d49f8f9b" />
+
+<img width="1920" height="1080" alt="Screenshot 2026-10-27 194809" src="https://github.com/user-attachments/assets/9f9d75e5-bf46-4eaa-b31d-177bbaca8aa6" />
+
+
+
 System Design for Shortify : 
 
 <img width="1497" height="608" alt="image" src="https://github.com/user-attachments/assets/b41ced45-688a-4c7b-8c18-ab2ff9615dcc" />
