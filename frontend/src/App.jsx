@@ -133,7 +133,7 @@ function App() {
         {shortUrl && (
           <div className="p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
             <div className="text-left overflow-hidden w-full">
-              <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">Aapka Short Link:</p>
+              <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">Short Link:</p>
               <a 
                 href={shortUrl} 
                 target="_blank" 
