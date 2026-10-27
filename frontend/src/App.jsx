@@ -56,7 +56,7 @@ function App() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
           <Activity size={14} className="text-blue-400" />
-          <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Project 3.O UI Live</span>
+          <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Shortify</span>
         </div>
 
         {/* Header */}
@@ -65,7 +65,7 @@ function App() {
             Shortify <span className="text-blue-500">URL</span>
           </h1>
           <p className="text-slate-400 text-lg">
-            Apne lambe URLs ko ek click mein chota aur trackable banayein.
+            Turn lengthy, unappealing URLs into neat, shareable short links for your social media bios and posts.
           </p>
         </div>
 
